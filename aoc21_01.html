@@ -1,39 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
-	<script>
-		"use strict";  
-    
+  <meta charset="utf-8">
+  <script>
+    "use strict";
+
     function calc() {
-      document.getElementById("result").innerHTML = getResult();      
-    }     
+      document.getElementById("result").innerHTML = getResult();
+    }
 
     function getResult() {
-      let result = 0;
-      let result2 = 0;
-
       const data = input.split("\n").map(Number);
-
-      for (let i = 1; i < data.length; ++i) {
-      	if (data[i] > data[i - 1]) {
-      		++result;
-      	}
-      }
-
       let sums = [];
 
       for (let i = 0; i < data.length - 2; ++i) {
-      	sums.push(data[i] + data[i + 1] + data[i + 2]);      	
+        sums.push(data[i] + data[i + 1] + data[i + 2]);
       }
 
-      for (let i = 1; i < sums.length; ++i) {
-      	if (sums[i] > sums[i - 1]) {
-      		++result2;
-      	}
+      return countIncreasing(data) + ", " + countIncreasing(sums);
+    }
+
+    function countIncreasing(data) {
+      let result = 0;
+
+      for (let i = 1; i < data.length; ++i) {
+        if (data[i] > data[i - 1]) {
+          ++result;
+        }
       }
 
-      return result + ", " + result2;
+      return result;
     }
 
 let input = `159
