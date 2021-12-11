@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script>
+    "use strict";
+
+    function calc() {
+      document.getElementById("result").innerHTML = getResult();
+    }
+
+    function getResult() { 
+      let octopus = input.split("\n").map(line => line.split(""));
+      
+      let step = 0;
+      let flash = 0;
+      let result = 0;
+      let result2 = 0;
+
+      while (step < 1000) {
+        ++step;
+
+        for (let i = 0; i < octopus.length; ++i) {
+          for (let j = 0; j < octopus[i].length; ++j) {
+            ++octopus[i][j];
+          }
+        }
+
+        let newFlash = true;
+
+        while (newFlash) {
+          newFlash = false;
+
+          for (let i = 0; i < octopus.length; ++i) {
+            for (let j = 0; j < octopus[i].length; ++j) {
+              if (octopus[i][j] > 9) {
+                newFlash = true;
+                ++flash;
+                octopus[i][j] = 0;
+
+                let neibs = [[i - 1, j - 1], [i - 1, j], [i - 1, j + 1],
+                             [i, j - 1], [i, j + 1],
+                             [i + 1, j - 1], [i + 1, j], [i + 1, j + 1]];
+
+                neibs.filter(([y, x]) => (octopus[y]||[])[x] > 0).forEach(([y, x]) => ++(octopus[y]||[])[x]);
+              }                            
+            }          
+          }   
+        }
+
+        if (step == 100) {
+          result = flash;
+        }
+
+        if (octopus.join(",").split(",").filter(e => e != 0).length == 0) {
+          result2 = step;
+          step = 1000;
+        }
+      }      
+          
+      return result + ", " + result2;
+    }
+
+let input1 = `5483143223
+2745854711
+5264556173
+6141336146
+6357385478
+4167524645
+2176841721
+6882881134
+4846848554
+5283751526`;
+
+let input = `2524255331
+1135625881
+2838353863
+1662312365
+6847835825
+2185684367
+6874212831
+5387247811
+2255482875
+8528557131`;
+
+</script>
+</head>
+<body onload="calc()">  
+  <div id="result"></div>  
+</body>
+</html>
