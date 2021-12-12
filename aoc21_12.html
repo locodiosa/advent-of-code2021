@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script>
+    "use strict";
+
+    function calc() {
+      document.getElementById("result").innerHTML = getResult();
+    }
+
+    function getResult() { 
+      const caves = input.split("\n").map(line => line.split("-"));     
+
+      const allPaths = [];
+      const contact = {};
+
+      for (let i = 0; i < caves.length; ++i) {
+        for (let j = 0; j < caves[i].length; ++j) {
+          if (contact[caves[i][j]] == undefined) {
+            contact[caves[i][j]] = [];
+          }
+
+          contact[caves[i][j]].push(caves[i][j + 1] || caves[i][j - 1]);
+        }
+      }
+
+      const queue = [["start"]];   
+
+      while (queue.length > 0) {
+        const path = queue.shift();
+        const last = path[path.length - 1];
+
+        contact[last].forEach(e => {
+          if (e == "end") {
+            allPaths.push([...path, "end"]);
+
+          } else if (e.match(/[a-z]+/g)) {
+            if (path.indexOf(e) < 0) {
+              queue.push([...path, e]);
+            }
+
+          } else {
+            queue.push([...path, e]);
+          }
+        });
+      }
+
+      const allPaths2 = [];
+      const queue2 = [["start"]];   
+
+      while (queue2.length > 0) {
+        const path = queue2.shift();
+        const last = path[path.length - 1];
+        
+        contact[last].forEach(e => {
+          if (e == "end") {
+            allPaths2.push([...path, "end"]);
+
+          } else if (e.match(/[a-z]+/g)) {
+            if (path.indexOf(e) < 0) {
+              queue2.push([...path, e]);
+
+            } else if (e != "start") {
+              let n = 0;
+              
+              for (let i = 0; i < path.length; ++i) {
+                if (path[i].match(/[a-z]+/g)) {
+                  if (path.filter(e => e == path[i]).length > 1) {
+                    ++n;
+                  }
+                }                
+              }
+
+              if (n < 1) {
+                queue2.push([...path, e]); 
+              }                                     
+            }
+
+          } else {
+            queue2.push([...path, e]);
+          }
+        });
+      } 
+
+      const result = allPaths.length;
+      const result2 = allPaths2.length;     
+          
+      return result + ", " + result2;
+    }
+
+const input = `fw-ll
+end-dy
+tx-fw
+tx-tr
+dy-jb
+ZD-dy
+dy-BL
+dy-tr
+dy-KX
+KX-start
+KX-tx
+fw-ZD
+tr-end
+fw-jb
+fw-yi
+ZD-nr
+start-fw
+tx-ll
+ll-jb
+yi-jb
+yi-ll
+yi-start
+ZD-end
+ZD-jb
+tx-ZD`;
+
+</script>
+</head>
+<body onload="calc()">  
+  <div id="result"></div>  
+</body>
+</html>
