@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script>
+    "use strict";
+
+    function calc() {
+      document.getElementById("result").innerHTML = getResult();
+    }
+
+    function getResult() { 
+      const target = input.match(/\-(\d+)|\d+/g).map(Number);
+      const [txFrom, txTo, tyTo, tyFrom] = target;
+           
+      let maxY = 0;
+      let numbers = 0;
+
+      for (let x = 1; x <= txTo; ++x) {
+        for (let y = tyTo; y < Math.abs(tyTo); ++y) {
+          let pos = [0, 0]; 
+          let v = [x, y]; 
+
+          while ((pos[0] < txFrom || pos[0] > txTo || pos[1] > tyFrom || pos[1] < tyTo) && v[1] >= tyTo) {
+            pos[0] += v[0];
+            pos[1] += v[1];
+
+            if (pos[0] >= txFrom && pos[0] <= txTo && pos[1] <= tyFrom && pos[1] >= tyTo) {
+              ++numbers;
+            }
+
+            maxY = pos[1] > maxY ? pos[1] : maxY;
+
+            if (v[0] > 0) {
+              --v[0];
+            }
+
+            --v[1]; 
+          }                   
+        }
+      }      
+
+      let result = maxY;
+      let result2 = numbers;
+
+      return result + ", " + result2;
+    }
+
+const input = `target area: x=282..314, y=-80..-45`;
+
+</script>
+</head>
+<body onload="calc()">  
+  <div id="result"></div>  
+</body>
+</html>
