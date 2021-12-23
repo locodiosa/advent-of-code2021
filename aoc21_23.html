@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script>
+    "use strict";
+
+    function calc() {
+      document.getElementById("result").innerHTML = getResult();
+    }
+
+    function getResult() { 
+
+    	// Решение: https://amphipod.net/
+
+    	const diagram = input.split("\n").map(line => line.split(""));
+    	diagram[3].push(" ", " ");
+    	diagram[4].push(" ", " ");
+    	console.log(diagram);
+
+    	const [A1, A2, B1, B2, C1, C2, D1, D2] = getAmphipods(diagram);
+    	getStartPositions(diagram, A1, A2, B1, B2, C1, C2, D1, D2);
+    	console.log([A1, A2, B1, B2, C1, C2, D1, D2]);
+
+    	const [roomA, roomB, roomC, roomD] = [[], [], [], []];
+    	const halway = [...diagram[1]];    	
+
+      let result = 0;         
+      let result2 = 0;
+
+      return result + ", " + result2;
+    }
+
+    function getAmphipods(diagram) {
+    	return [{	pos: null,
+    						goal: [[2, 3], [3, 3]],
+    						energy: 1	},
+
+    					{	pos: null,
+    						goal: [[2, 3], [3, 3]],
+    						energy: 1	},
+
+    					{	pos: null,
+								goal: [[2, 5], [3, 5]],
+								energy: 10	},
+
+    					{	pos: null,
+								goal: [[2, 5], [3, 5]],
+								energy: 10	},
+
+    					{	pos: null,
+								goal: [[2, 7], [3, 7]],
+								energy: 100	},
+
+    					{	pos: null,
+								goal: [[2, 7], [3, 7]],
+								energy: 100	},
+
+    					{	pos: null,
+								goal: [[2, 9], [3, 9]],
+								energy: 1000	},
+
+    					{	pos: null,
+								goal: [[2, 9], [3, 9]],
+								energy: 1000	}];
+    }
+
+   	function getStartPositions(diagram, A1, A2, B1, B2, C1, C2, D1, D2) {
+   		for (let y = 0; y < diagram.length; ++y) {
+    		for (let x = 0; x < diagram[y].length; ++x) {
+    			if (diagram[y][x] == "A") {
+    				if (A1.pos == null) {
+    					A1.pos = [y, x];
+    				} else {
+    					A2.pos = [y, x];
+    				}
+    			} else if (diagram[y][x] == "B") {
+    				if (B1.pos == null) {
+    					B1.pos = [y, x];
+    				} else {
+    					B2.pos = [y, x];
+    				}
+    			} else if (diagram[y][x] == "C") {
+    				if (C1.pos == null) {
+    					C1.pos = [y, x];
+    				} else {
+    					C2.pos = [y, x];
+    				}
+    			} else if (diagram[y][x] == "D") {
+    				if (D1.pos == null) {
+    					D1.pos = [y, x];
+    				} else {
+    					D2.pos = [y, x];
+    				}
+    			}
+    		}
+    	}
+   	} 
+
+const test = ``;
+
+const input = `#############
+#...........#
+###B#A#B#C###
+  #D#A#D#C#
+  #########`;
+/*
+
+PART1:
+
+#############
+#...........#
+###B#A#B#C###
+  #D#A#D#C#
+  #########
+
+A-10
+#############
+#AA.........#
+###B#.#B#C###
+  #D#.#D#C#
+  #########
+
+A-10 B-5
+#############
+#AA.........#
+###.#.#B#C###
+  #D#B#D#C#
+  #########
+
+A-10 B-9
+#############
+#AA.........#
+###.#B#.#C###
+  #D#B#D#C#
+  #########
+
+A-10 B-9 C-7
+#############
+#AA...C...C.#
+###.#B#.#.###
+  #D#B#D#.#
+  #########
+
+A-10 B-9 C-7 D-6
+#############
+#AA...C...C.#
+###.#B#.#.###
+  #D#B#.#D#
+  #########
+
+A-10 B-9 C-10 D-6
+#############
+#AA.......C.#
+###.#B#.#.###
+  #D#B#C#D#
+  #########
+
+A-10 B-9 C-14 D-6
+#############
+#AA.........#
+###.#B#C#.###
+  #D#B#C#D#
+  #########
+
+A-10 B-9 C-14 D-15
+#############
+#AA.........#
+###.#B#C#D###
+  #.#B#C#D#
+  #########
+
+A-16 B-90 C-1400 D-15000
+#############
+#...........#
+###A#B#C#D###
+  #A#B#C#D#
+  #########
+
+*/
+
+</script>
+</head>
+<body onload="calc()">  
+  <div id="result"></div>  
+</body>
+</html>
