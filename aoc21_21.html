@@ -15,10 +15,48 @@
       let pos1 = +data[0][data[0].length - 1] - 1;
       let pos2 = +data[1][data[1].length - 1] - 1;          
               
-      let result2 = 0;           
+      let result2 = 0;
+
+      const player1 = {	pos: 		pos1,
+      								 	score: 	0,
+      								 	path: 	1,
+      								 	wins: 	0	};
+
+      const player2 = {	pos: 		pos2,
+      								 	score: 	0,
+      								 	path: 	1,
+      								 	wins: 	0	};      
 
       return play1(pos1, pos2, 100) + ", " + result2;     	
+    }  
+
+    function play2(player) {
+    	for (let i = 0; i < player.path; ++i) {
+    		getWins(player, steps);
+    	}
     }
+
+    function getWins(player) {
+    	const steps = {	3: 1,
+      							 	4: 3,
+      							 	5: 6,
+      							 	6: 7,
+      							 	7: 6,
+      							 	8: 3,
+      							 	9: 1	};
+
+    	Object.keys(steps).forEach(k => {
+    		player.pos += k;
+    		player.score += pos % 10 + 1;
+    		player.path *= steps[k];
+
+    		if (score >= 21) {
+    			return player.wins;
+    		}  
+
+    		player.wins += getWins(player, steps);    		  		
+    	});
+    }      
 
     function play1(pos1, pos2, die) {
     	let score1 = 0;
