@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script>
+    "use strict";
+
+    function calc() {
+      document.getElementById("result").innerHTML = getResult();
+    }
+
+    function getResult() { 
+    	const code = input.split("\n").map(line => line.split(" "));
+
+    	const steps = [ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13];
+
+    	//TODO: разделить part1 и part2
+    	//const inp   = [ 9,  9,  9,  9,  9,  9,  9,  9,  9,  9,  9,  9,  9,  9];
+    	const inp   = [ 1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1];
+
+    	const addX  = [12, 11, 10, 10,-16, 14, 12, -4, 15, -7, -8, -4,-15, -8];
+    	const addY  = [ 6, 12,  5, 10,  7,  0,  4, 12, 14, 13, 10, 11,  9,  9];
+
+    	const divZ  = [ 1,  1,  1,  1, 26,  1,  1, 26,  1, 26, 26, 26, 26, 26];    	
+
+    	let index = [8, 6, 5, 3, 2, 1, 0];
+
+    	//let number = [9, 9, 9, 9, 9, 9, 9, 9];
+    	let number = [1, 1, 1, 1, 1, 1, 1, 1];
+
+    	//while (number[number.length - 1] == 9) {
+    	while (number[number.length - 1] == 1) {
+    		for (let i = 0; i < index.length; ++i) {
+    			inp[index[i]] = number[i];
+    		}
+    		
+  			let [w, x, z] = [0, 0, 0];
+
+    		for (let step = 0; step < steps.length; ++step) {
+	    		w = inp[step];
+		    	x = z % 26;
+		    	z = Math.floor(z / divZ[step]);
+		    	x += addX[step];
+
+		    	if (x > 0 && x < 10) {
+		    		w = x;
+		    		inp[step] = x;	    		
+		    	}
+
+		    	if (x != w) {
+				  	z *= 26;
+				  	z += w + addY[step];
+				  }				  
+	    	}
+
+	    	if (z == 0) {
+			  	console.log(inp.join(""));
+			  	break;
+			  }
+	    	
+	    	for (let i = 0; i < number.length; ++i) {
+	    		//--number[i];
+	    		++number[i];
+
+	    		//if (number[i] == 0) {
+	    			//number[i] = 9;
+
+	    		if (number[i] == 10) {
+	    			number[i] = 1;
+	    		} else {
+	    			break;
+	    		}
+	    	}
+    	}   			
+    		    	
+
+      let result = 0;              
+      let result2 = 0;
+
+      return result + ", " + result2;
+    }
+    
+const test = ``;   
+
+const input = `inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 12
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 6
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 11
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 12
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 10
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 5
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 10
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 10
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -16
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 7
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 14
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 0
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 12
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 4
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -4
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 12
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 15
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 14
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -7
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 13
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -8
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 10
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -4
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 11
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -15
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 9
+mul y x
+add z y
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -8
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 9
+mul y x
+add z y`;
+
+</script>
+</head>
+<body onload="calc()">  
+  <div id="result"></div>  
+</body>
+</html>
