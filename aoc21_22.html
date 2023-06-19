@@ -1,62 +1,225 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <script>
-    "use strict";
+<meta charset="utf-8">
+<script>
+	"use strict";
 
-    function calc() {
-      document.getElementById("result").innerHTML = getResult();
-    }
+	function calc() {
+		document.getElementById("result").innerHTML = getResult();
+	}
 
-    function getResult() { 
-    	const coords = test.split("\n").map(line => line.split(" "));
+	function getResult() { 
+		const coords = input.split("\n").map(line => line.split(" "));
 
-      coords.forEach(line => {
-      	line[1] = line[1].match(/-?\d+/g).map(Number);      	
-      });  
+		let part1 = reboot(1, coords);
+		let part2 = reboot(2, coords);
 
-      let result = 0;
-      //result = turnOn(coords);  
+		return part1 + ", " + part2;
+	}
 
-      coords.forEach(line => {
-      	const [x1, x2, y1, y2, z1, z2] = line[1];
-      	const [dx, dy, dz] = [Math.abs(x2 - x1), Math.abs(y2 - y1), Math.abs(z2 - z1)];
+	function reboot(part, coords) {
+		let result = 0;
+		let cubes = new Set();
 
-      	let cubes = (dx * dy) + (dy * dz) + (dz * dx);
-      	console.log(cubes);
-      });                        
-         
-      let result2 = 0;
+		coords.forEach(line => {
+			let coords = line[1].match(/-?\d+/g).map(Number);
 
-      return result + ", " + result2;
-    }
+			const [xFrom, xTo, yFrom, yTo, zFrom, zTo] = coords;
 
-   	function turnOn(coords) {
-   		const on = new Set();
+			if (part == 1) {
+				if (xFrom >= -50 && xTo <= 50 && yFrom >= -50 && yTo <= 50 && zFrom >= -50 && zTo <= 50) {
+					cubes = doCommands(line[0], coords, cubes);
+				}
+			} else {
+				cubes = doCommands(line[0], coords, cubes);
+			}
+		});
 
-      coords.forEach(line => {
-      	let [x1, x2, y1, y2, z1, z2] = line[1];
+		cubes.forEach(pix => {
+			let dx = pix.x2 - pix.x1 + 1;
+			let dy = pix.y2 - pix.y1 + 1;
+			let dz = pix.z2 - pix.z1 + 1;
 
-      	if (x1 >= -50 && x2 <= 50 && y1 >= -50 && y2 <= 50 && z1 >= -50 && z2 <= 50) {
-      		for (let x = x1; x <= x2; ++x) {
-      			for (let y = y1; y <= y2; ++y) {
-      				for (let z = z1; z <= z2; ++z) {
-      					if (line[0] == "on") {
-      						on.add(x + "," + y + "," + z);
-      					} else {
-      						on.delete(x + "," + y + "," + z);
-      					}      					
-      				}
-      			}
-      		}
-      	}
-      });
+			result += (dx * dy * dz);
+		});
 
-      return on.size;
-   	}
+		return result;
+	}
 
-const test1 = `on x=10..12,y=0..1,z=5..9`;
+	function doCommands(command, coords, cubes) {
+		if (command == "on") {
+			turnOn(coords, cubes).forEach(cubes.add, cubes);
+		} else {
+			turnOff(coords, cubes).forEach(cubes.add, cubes);
+		}
+
+		return cubes;
+	}
+
+	function turnOn(line, cubesG) {
+		const cubes = [];
+		cubesG.forEach(o => cubes.push(o));
+
+		const [xFrom, xTo, yFrom, yTo, zFrom, zTo] = line;
+		const cubesNew = new Set();
+
+		let cross = false;
+
+		for (let i = 0; i < cubes.length; ++i) {
+			if (xFrom <= cubes[i].x2 && xTo >= cubes[i].x1) {
+				if (yFrom <= cubes[i].y2 && yTo >= cubes[i].y1) {
+					if (zFrom <= cubes[i].z2 && zTo >= cubes[i].z1) {
+						addNewCubes(xFrom, xTo, yFrom, yTo, zFrom, zTo, cubes[i])
+							.forEach(cubesNew.add, cubesNew);
+
+						cross = true;
+						i = cubes.length;
+					}
+				}
+			}
+		}
+
+		for (let i = 0; i < cubes.length; ++i) {
+			cubesNew.forEach(o => {
+				if (o.x1 <= cubes[i].x2 && o.x2 >= cubes[i].x1) {
+					if (o.y1 <= cubes[i].y2 && o.y2 >= cubes[i].y1) {
+						if (o.z1 <= cubes[i].z2 && o.z2 >= cubes[i].z1) {
+
+							addNewCubes(o.x1, o.x2, o.y1, o.y2, o.z1, o.z2, cubes[i])
+								.forEach(cubesNew.add, cubesNew);
+
+							cubesNew.delete(o);
+						}
+					}
+				}
+			});
+		}
+
+		if (cross) {
+			cubesNew.forEach(e => cubes.push(e));
+		} else {
+			cubes.push({x1: xFrom, x2: xTo, y1: yFrom, y2: yTo, z1: zFrom, z2: zTo});
+		}
+
+		return cubes;
+	}
+
+	function addNewCubes(xFrom, xTo, yFrom, yTo, zFrom, zTo, cube) {
+		const cubesNew = [];
+
+		if (zFrom < cube.z1) {
+			cubesNew.push({x1: xFrom, x2: xTo,
+						   y1: yFrom, y2: yTo,
+						   z1: zFrom, z2: cube.z1 - 1});
+		}
+
+		if (zTo > cube.z2) {
+			cubesNew.push({x1: xFrom, x2: xTo,
+						   y1: yFrom, y2: yTo,
+						   z1: cube.z2 + 1, z2: zTo});
+		}
+
+		if (yFrom < cube.y1) {
+			cubesNew.push({x1: xFrom, x2: xTo,
+						   y1: yFrom, y2: cube.y1 - 1,
+						   z1: (zFrom > cube.z1) ? zFrom : cube.z1, z2: (cube.z2 < zTo) ? cube.z2 : zTo});
+		}
+
+		if (yTo > cube.y2) {
+			cubesNew.push({x1: xFrom, x2: xTo,
+						   y1: cube.y2 + 1, y2: yTo,
+						   z1: (zFrom > cube.z1) ? zFrom : cube.z1, z2: (cube.z2 < zTo) ? cube.z2 : zTo});
+		}
+
+		if (xFrom < cube.x1) {
+			cubesNew.push({x1: xFrom, x2: cube.x1 - 1,
+						   y1: (yFrom > cube.y1) ? yFrom : cube.y1, y2: (cube.y2 < yTo) ? cube.y2 : yTo,
+						   z1: (zFrom > cube.z1) ? zFrom : cube.z1, z2: (cube.z2 < zTo) ? cube.z2 : zTo});
+		}
+
+		if (xTo > cube.x2) {
+			cubesNew.push({x1: cube.x2 + 1, x2: xTo,
+						   y1: (yFrom > cube.y1) ? yFrom : cube.y1, y2: (cube.y2 < yTo) ? cube.y2 : yTo,
+						   z1: (zFrom > cube.z1) ? zFrom : cube.z1, z2: (cube.z2 < zTo) ? cube.z2 : zTo}); 
+		}
+
+		return cubesNew;
+	}
+
+	function turnOff(line, cubesG) {
+		const cubes = [];
+		cubesG.forEach(o => cubes.push(o));
+
+		const [xFrom, xTo, yFrom, yTo, zFrom, zTo] = line;
+		const cubesNew = new Set();
+
+		let cross = false;
+
+		for (let i = 0; i < cubes.length; ++i) {
+			if (xFrom <= cubes[i].x2 && xTo >= cubes[i].x1) {
+				if (yFrom <= cubes[i].y2 && yTo >= cubes[i].y1) {
+					if (zFrom <= cubes[i].z2 && zTo >= cubes[i].z1) {
+						divideCubes(xFrom, xTo, yFrom, yTo, zFrom, zTo, cubes[i])
+							.forEach(cubesNew.add, cubesNew);
+
+						cubesG.delete(cubes[i]);
+
+						cross = true;
+						cubes[i] = null;
+					}
+				}
+			}
+		}
+
+		if (cross) {
+			cubesNew.forEach(e => cubes.push(e));
+		}
+
+		return cubes.filter(e => e != null);
+	}
+
+	function divideCubes(xFrom, xTo, yFrom, yTo, zFrom, zTo, cube) {
+		const cubesNew = [];
+
+		if (zTo < cube.z2) {
+			cubesNew.push({x1: cube.x1, x2: cube.x2,
+						   y1: cube.y1, y2: cube.y2,
+						   z1: zTo + 1, z2: cube.z2});
+		}
+
+		if (zFrom > cube.z1) {
+			cubesNew.push({x1: cube.x1, x2: cube.x2,
+						   y1: cube.y1, y2: cube.y2,
+						   z1: cube.z1, z2: zFrom - 1});
+		}
+
+		if (yTo < cube.y2) {
+			cubesNew.push({x1: cube.x1, x2: cube.x2,
+						   y1: yTo + 1, y2: cube.y2,
+						   z1: (zFrom > cube.z1) ? zFrom : cube.z1, z2: (cube.z2 < zTo) ? cube.z2 : zTo}); 
+		}
+
+		if (yFrom > cube.y1) {
+			cubesNew.push({x1: cube.x1, x2: cube.x2,
+						   y1: cube.y1, y2: yFrom - 1,
+						   z1: (zFrom > cube.z1) ? zFrom : cube.z1, z2: (cube.z2 < zTo) ? cube.z2 : zTo}); 
+		}
+
+		if (xTo < cube.x2) {
+			cubesNew.push({x1: xTo + 1, x2: cube.x2,
+						   y1: (yFrom > cube.y1) ? yFrom : cube.y1, y2: (cube.y2 < yTo) ? cube.y2 : yTo,
+						   z1: (zFrom > cube.z1) ? zFrom : cube.z1, z2: (cube.z2 < zTo) ? cube.z2 : zTo});
+		}
+
+		if (xFrom > cube.x1) {
+			cubesNew.push({x1: cube.x1, x2: xFrom - 1,
+						   y1: (yFrom > cube.y1) ? yFrom : cube.y1, y2: (cube.y2 < yTo) ? cube.y2 : yTo,
+						   z1: (zFrom > cube.z1) ? zFrom : cube.z1, z2: (cube.z2 < zTo) ? cube.z2 : zTo}); 
+		}
+
+		return cubesNew;
+	}
 
 const test = `on x=-5..47,y=-31..22,z=-19..33
 on x=-44..5,y=-27..21,z=-14..35
