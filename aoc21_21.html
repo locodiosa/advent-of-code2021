@@ -1,104 +1,95 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <script>
-    "use strict";
+	<meta charset="utf-8">
+	<script>
+		"use strict";
 
-    function calc() {
-      document.getElementById("result").innerHTML = getResult();
-    }
+		function calc() {
+			document.getElementById("result").innerHTML = getResult();
+		}
 
-    function getResult() { 
-      const data = input.split("\n").map(e => e.split(" "));
+		function getResult() {
+			const data = input.split("\n").map(e => e.split(" "));
 
-      let pos1 = +data[0][data[0].length - 1] - 1;
-      let pos2 = +data[1][data[1].length - 1] - 1;          
-              
-      let result2 = 0;
+			const pos1 = +data[0][data[0].length - 1] - 1;
+			const pos2 = +data[1][data[1].length - 1] - 1;
 
-      const player1 = {	pos: 		pos1,
-      								 	score: 	0,
-      								 	path: 	1,
-      								 	wins: 	0	};
+			const players = [{pos: pos1, score: 0},
+											 {pos: pos2, score: 0}];
 
-      const player2 = {	pos: 		pos2,
-      								 	score: 	0,
-      								 	path: 	1,
-      								 	wins: 	0	};      
+			return play1(pos1, pos2, 100) + ", " + play2(players);
+		}
 
-      return play1(pos1, pos2, 100) + ", " + result2;     	
-    }  
+		function play1(pos1, pos2, die) {
+			let score1 = 0;
+			let score2 = 0;
 
-    function play2(player) {
-    	for (let i = 0; i < player.path; ++i) {
-    		getWins(player, steps);
-    	}
-    }
+			let turn = 0;
 
-    function getWins(player) {
-    	const steps = {	3: 1,
-      							 	4: 3,
-      							 	5: 6,
-      							 	6: 7,
-      							 	7: 6,
-      							 	8: 3,
-      							 	9: 1	};
+			for (let i = 1;; i += 6) {
+				let step1 = (i % die) + ((i + 1) % die) + ((i + 2) % die);
+				turn += 3;
 
-    	Object.keys(steps).forEach(k => {
-    		player.pos += k;
-    		player.score += pos % 10 + 1;
-    		player.path *= steps[k];
+				pos1 = (pos1 + step1) % 10;
+				score1 += pos1 + 1;
 
-    		if (score >= 21) {
-    			return player.wins;
-    		}  
+				if (score1 >= 1000) {
+					return score2 * turn;
+				}
 
-    		player.wins += getWins(player, steps);    		  		
-    	});
-    }      
+				let step2 = ((i + 3) % die) + ((i + 4) % die) + ((i + 5) % die);
+				turn += 3;
 
-    function play1(pos1, pos2, die) {
-    	let score1 = 0;
-      let score2 = 0;
+				pos2 = (pos2 + step2) % 10;
+				score2 += pos2 + 1;
 
-     	let turn = 0;
-     	let i = 1;
-     	
-   		while (true) {
-   			let step1 = (i % die) + ((i + 1) % die) + ((i + 2) % die);
-   			turn += 3;
+				if (score1 >= 1000) {
+					return score1 * turn;
+				}
+			}
+		}
 
-   			pos1 += step1;
-   			score1 += pos1 % 10 + 1;
+		function play2(players) {
+			return Math.max(...getWins(0, 1, players));
+		}
 
-   			if (score1 >= 1000) {
-   				return score2 * turn;   				   								  				
-   			}
+		function getWins(turn, path, pl) {
+			const steps = [[3, 1], [4, 3], [5, 6], [6, 7], [7, 6], [8, 3], [9, 1]];
 
-   			let step2 = ((i + 3) % die) + ((i + 4) % die) + ((i + 5) % die);
-   			turn += 3;
+			const turnNext = (turn + 1) % pl.length;
+			const wins = [0, 0];
 
-   			pos2 += step2;
-   			score2 += pos2 % 10 + 1;
+			steps.forEach(([step, universes]) => {
+				const players = [{...pl[0]}, {...pl[1]}];
 
-   			if (score1 >= 1000) {
-   				return score1 * turn;  				   				
-   			}
+				players[turn].pos = (players[turn].pos + step) % 10;
+				players[turn].score += players[turn].pos + 1;
+				const pathNext = path * universes;
 
-   			i = (i + 6) % die;
-   		}   
-    }
+				if (players[turn].score >= 21) {
+					wins[turn] += pathNext;
+
+				} else {
+					const [a, b] = getWins(turnNext, pathNext, players);
+
+					wins[0] += a;
+					wins[1] += b;
+				}
+			});
+
+			return wins;
+		}
 
 const test = `Player 1 starting position: 4
-Player 2 starting position: 8`;   
+Player 2 starting position: 8`;
 
 const input = `Player 1 starting position: 6
 Player 2 starting position: 2`;
 
 </script>
 </head>
-<body onload="calc()">  
-  <div id="result"></div>  
+<body onload="calc()">
+  <div id="result"></div>
 </body>
 </html>
